@@ -66,6 +66,7 @@ jobs:
               --junitxml=./test-reports/junit.xml \
               --cov-report xml:./test-reports/coverage.xml \
               --cov src/kfs \
+              --cov tests \
               tests
         if: ${{ always() }}
       - name: Publish code coverage
