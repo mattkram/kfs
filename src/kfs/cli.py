@@ -10,7 +10,6 @@ app = typer.Typer()
 @app.command()
 def version() -> None:
     """Show project version."""
-
     console.print(f"kfs version: {__version__}", style="bold green")
 
 
