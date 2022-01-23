@@ -1,0 +1,25 @@
+[tool.poetry]
+name = "tagfs"
+version = "0.1.0"
+description = ""
+authors = ["Matt Kramer <matthew.robert.kramer@gmail.com>"]
+
+[tool.poetry.dependencies]
+python = "^3.9"
+
+rich = "^10.14.0"
+
+[tool.poetry.dev-dependencies]
+black = "21.11b1"
+mypy = "^0.910"
+pytest = "^6.2.5"
+pytest-cov = "^3.0.0"
+
+[tool.isort]
+profile = "black"
+#multi_line_output = 3  # Allow multiple imports on a line, but split when too long
+force_single_line = true
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
