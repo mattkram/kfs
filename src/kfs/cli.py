@@ -14,5 +14,5 @@ def version() -> None:
 
 
 @app.command()
-def dummy() -> None:
+def dummy() -> None:  # pragma: no cover
     """Temporarily here to make version a sub-command."""
