@@ -65,7 +65,7 @@ jobs:
           pytest \
               --junitxml=./test-reports/junit.xml \
               --cov-report xml:./test-reports/coverage.xml \
-              --cov tagfs \
+              --cov src/kfs \
               tests
         if: ${{ always() }}
       - name: Publish code coverage
