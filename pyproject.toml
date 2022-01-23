@@ -3,18 +3,23 @@ name = "kfs"
 version = "0.1.0"
 description = "Kramer's File System"
 authors = ["Matt Kramer <matthew.robert.kramer@gmail.com>"]
+packages = [
+    { include = "kfs", from = "src" },
+]
 
 [tool.poetry.dependencies]
 python = "^3.9"
 
 rich = "^10.14.0"
 typer = "^0.4.0"
+importlib-metadata = { version = "^4.10.1", python = "<3.8" }
 
 [tool.poetry.dev-dependencies]
 black = "21.11b1"
 mypy = "^0.910"
 pytest = "^6.2.5"
 pytest-cov = "^3.0.0"
+toml = "^0.10.2"
 
 [tool.isort]
 profile = "black"
