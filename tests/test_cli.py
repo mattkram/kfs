@@ -1,9 +1,9 @@
 from typing import Callable
 
 import pytest
-from click.testing import Result
 from mypy_extensions import VarArg
 from typer.testing import CliRunner
+from typer.testing import Result
 
 from kfs import __version__
 from kfs.cli import app
