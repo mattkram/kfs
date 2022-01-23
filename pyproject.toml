@@ -24,6 +24,7 @@ codecov = {version = "^2.1.12", optional = true}
 pytest = "^6.2.5"
 pytest-cov = "^3.0.0"
 toml = "^0.10.2"
+mypy = "^0.931"
 
 [tool.poetry.extras]
 ci = ["codecov"]
