@@ -68,9 +68,9 @@ jobs:
               --cov tagfs \
               tests
         if: ${{ always() }}
-#      - name: Publish code coverage
-#        run: |
-#          poetry run codecov -t $CODECOV_TOKEN
-#        env:
-#          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
-#        if: ${{ always() }}
+      - name: Publish code coverage
+        run: |
+          poetry run codecov -t $CODECOV_TOKEN
+        env:
+          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+        if: ${{ always() }}
