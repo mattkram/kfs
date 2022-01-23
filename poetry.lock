@@ -365,10 +365,13 @@ brotli = ["brotlipy (>=0.6.0)"]
 secure = ["pyOpenSSL (>=0.14)", "cryptography (>=1.3.4)", "idna (>=2.0.0)", "certifi", "ipaddress"]
 socks = ["PySocks (>=1.5.6,!=1.5.7,<2.0)"]
 
+[extras]
+ci = ["codecov"]
+
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.9"
-content-hash = "46aea93339bd73e9fced9e2525959de6b86c1375fc2c2324b15685611cec7458"
+content-hash = "d9156886b3b44275a8673fe5f82bf89efb6d805a6c5f8731e255bb5d58e82ca4"
 
 [metadata.files]
 atomicwrites = [
