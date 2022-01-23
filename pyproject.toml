@@ -8,6 +8,7 @@ authors = ["Matt Kramer <matthew.robert.kramer@gmail.com>"]
 python = "^3.9"
 
 rich = "^10.14.0"
+typer = "^0.4.0"
 
 [tool.poetry.dev-dependencies]
 black = "21.11b1"
