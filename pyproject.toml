@@ -1,7 +1,7 @@
 [tool.poetry]
-name = "tagfs"
+name = "kfs"
 version = "0.1.0"
-description = ""
+description = "Kramer's File System"
 authors = ["Matt Kramer <matthew.robert.kramer@gmail.com>"]
 
 [tool.poetry.dependencies]
