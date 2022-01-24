@@ -50,7 +50,7 @@ def init(url: str) -> None:
 
 def get_engine() -> Engine:
     """Get the global database engine."""
-    if _engine is None:
+    if _engine is None:  # pragma: no cover
         raise ValueError("Engine must be initialized with `db.init()`")
     return _engine
 
