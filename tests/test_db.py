@@ -12,13 +12,13 @@ def base_dir(tmp_path: Path) -> Path:
 
 
 @pytest.fixture()
-def sqlite_filename() -> str:
-    return "kfs.db"
+def sql_file_path(base_dir: Path) -> Path:
+    return base_dir / "kfs.db"
 
 
 @pytest.fixture()
-def sqlite_url(base_dir: Path, sqlite_filename: str) -> str:
-    return f"sqlite:///{base_dir / sqlite_filename}"
+def sqlite_url(sql_file_path: Path) -> str:
+    return f"sqlite:///{sql_file_path}"
 
 
 @pytest.fixture(autouse=True)
@@ -26,9 +26,9 @@ def database(sqlite_url: str) -> None:
     db.init(sqlite_url)
 
 
-def test_init(base_dir: Path, sqlite_filename: str, sqlite_url: str) -> None:
+def test_init(sql_file_path: Path) -> None:
     """After init, the database has been created and the file exists"""
-    assert (base_dir / sqlite_filename).exists()
+    assert sql_file_path.exists()
 
 
 def test_database() -> None:
