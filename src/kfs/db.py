@@ -9,7 +9,7 @@ from sqlmodel import Session
 from sqlmodel import SQLModel
 from sqlmodel import create_engine
 
-engine: Optional[Engine] = None
+_engine: Optional[Engine] = None
 
 
 class FileTagAssociation(SQLModel, table=True):
@@ -42,12 +42,19 @@ class Tag(SQLModel, table=True):
 
 
 def init(url: str) -> None:
-    global engine
-    engine = create_engine(url)
+    global _engine
+    _engine = create_engine(url)
 
-    SQLModel.metadata.create_all(engine)
+    SQLModel.metadata.create_all(_engine)
+
+
+def get_engine() -> Engine:
+    """Get the global database engine."""
+    if _engine is None:
+        raise ValueError("Engine must be initialized with `db.init()`")
+    return _engine
 
 
 def get_session() -> Session:
     """Create a new database session to use as a context manager."""
-    return Session(engine)
+    return Session(get_engine())
