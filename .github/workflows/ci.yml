@@ -31,18 +31,8 @@ jobs:
     - name: Install CI packages
       run: pip install ".[ci]"
 
-    - name: Static type check with mypy
-      run: mypy .
-
-    - name: Test with pytest
-      run: |
-        pytest \
-            --junitxml=./test-reports/junit.xml \
-            --cov-report xml:./test-reports/coverage.xml \
-            --cov src/kfs \
-            --cov tests \
-            tests
-      if: ${{ always() }}
+    - name: Run tox
+      run: tox
 
     - name: Publish code coverage
       run: |
