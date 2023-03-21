@@ -12,7 +12,7 @@ from kfs import __version__
 from kfs.cli import app
 
 if TYPE_CHECKING:
-    from mypy_extensions import VarArg
+    from mypy_extensions import VarArg  # pragma: no cover
 else:
 
     def VarArg(x):
