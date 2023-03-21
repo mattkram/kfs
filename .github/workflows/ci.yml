@@ -18,13 +18,15 @@ jobs:
     - uses: pre-commit/action@v2.0.3
 
   test:
+    name: Test, Python ${{ matrix.python-version }}
     needs: [pre-commit]
+    runs-on:
+      labels: ${{ matrix.os }}
     strategy:
-      fail-fast: true
+      fail-fast: false
       matrix:
         os: [ubuntu-latest]
-        python-version: ['3.9']
-    runs-on: ${{ matrix.os }}
+        python-version: ['3.9', '3.10']
     steps:
     - name: Check out repository
       uses: actions/checkout@v2
@@ -34,35 +36,14 @@ jobs:
       with:
         python-version: ${{ matrix.python-version }}
 
-    - name: Install Poetry
-      uses: snok/install-poetry@v1.1.6
-      with:
-        virtualenvs-create: true
-        virtualenvs-in-project: true
-
-    - name: Load cached venv
-      id: cached-poetry-dependencies
-      uses: actions/cache@v2
-      with:
-        path: .venv
-        key: venv-${{ runner.os }}-${{ hashFiles('**/poetry.lock') }}
-
-    - name: Install dependencies
-      if: steps.cached-poetry-dependencies.outputs.cache-hit != 'true'
-      run: poetry install --no-interaction --no-root
-
-    - name: Install library
-      run: poetry install --no-interaction --extras ci
+    - name: Install CI packages
+      run: pip install ".[ci]"
 
     - name: Static type check with mypy
-      run: |
-        source .venv/bin/activate
-        mypy .
-      if: ${{ always() }}
+      run: mypy .
 
     - name: Test with pytest
       run: |
-        source .venv/bin/activate
         pytest \
             --junitxml=./test-reports/junit.xml \
             --cov-report xml:./test-reports/coverage.xml \
@@ -73,6 +54,6 @@ jobs:
 
     - name: Publish code coverage
       run: |
-        poetry run codecov -t $CODECOV_TOKEN
+        codecov -t $CODECOV_TOKEN
       env:
         CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
