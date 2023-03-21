@@ -1,39 +1,43 @@
-[tool.poetry]
-name = "kfs"
-version = "0.1.0"
+[build-system]
+build-backend = "setuptools.build_meta"
+requires = ["setuptools", "setuptools-scm[toml]>=6.2"]
+
+[project]
+authors = [
+  {name = "Matt Kramer", email = "matthew.robert.kramer@gmail.com"}
+]
+dependencies = [
+  "rich<=11.0.0",
+  "sqlmodel<=0.0.6",
+  "typer<=0.4.0"
+]
 description = "Kramer's File System"
-authors = ["Matt Kramer <matthew.robert.kramer@gmail.com>"]
-packages = [
-    { include = "kfs", from = "src" },
+dynamic = ["version"]
+license = {text = "MIT"}
+name = "kfs"
+requires-python = ">=3.10"
+
+[project.optional-dependencies]
+ci = [
+  "kfs[dev]",
+  "codecov<=2.1.12"
+]
+dev = [
+  "mypy<=0.931",
+  "pytest<=6.2.5",
+  "pytest-cov<=3.0.0",
+  "toml<=0.10.2"
 ]
 
-[tool.poetry.scripts]
-kfs = 'kfs.cli:app'
+[project.scripts]
+kfs = "kfs.cli:app"
 
-[tool.poetry.dependencies]
-python = "^3.9"
-
-rich = "^11.0.0"
-sqlmodel = "^0.0.6"
-typer = "^0.4.0"
-
-# Optional dependencies
-codecov = {version = "^2.1.12", optional = true}
-
-[tool.poetry.dev-dependencies]
-pytest = "^6.2.5"
-pytest-cov = "^3.0.0"
-toml = "^0.10.2"
-mypy = "^0.931"
-
-[tool.poetry.extras]
-ci = ["codecov"]
+[tool.distutils.bdist_wheel]
+universal = true
 
 [tool.isort]
-profile = "black"
-#multi_line_output = 3  # Allow multiple imports on a line, but split when too long
 force_single_line = true
+profile = "black"
 
-[build-system]
-requires = ["poetry-core>=1.0.0"]
-build-backend = "poetry.core.masonry.api"
+[tool.setuptools_scm]
+version_scheme = "post-release"
