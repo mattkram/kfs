@@ -1,5 +1,6 @@
 from pathlib import Path
 from typing import Callable
+from unittest.mock import _Call
 from unittest.mock import patch
 
 import pytest
@@ -87,9 +88,8 @@ def test_add_tag_to_file(call_cli: CLICaller, base_dir: Path) -> None:
     assert result.exit_code == 0
 
     assert mock.call_count == len(filenames)
-    mock.assert_has_calls(
-        [
-            ((base_dir / "file_1.txt", "bank:chase"),),  # type: ignore
-            ((base_dir / "file_2.txt", "bank:chase"),),  # type: ignore
-        ]
-    )
+    expected_calls = []
+    for filename in filenames:
+        args = (base_dir / filename, "bank:chase")
+        expected_calls.append(_Call((args, {})))
+    mock.assert_has_calls(expected_calls)
