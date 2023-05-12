@@ -21,10 +21,10 @@ jobs:
         python-version: ['3.10']
     steps:
     - name: Check out repository
-      uses: actions/checkout@v2
+      uses: actions/checkout@ee0669bd1cc54295c223e0bb666b733df41de1c5 # v2
 
     - name: Set up python ${{ matrix.python-version }}
-      uses: actions/setup-python@v2
+      uses: actions/setup-python@75f3110429a8c05be0e1bf360334e4cced2b63fa # v2
       with:
         python-version: ${{ matrix.python-version }}
 
@@ -35,7 +35,7 @@ jobs:
       run: tox
 
     - name: Upload coverage to Codecov
-      uses: codecov/codecov-action@v3
+      uses: codecov/codecov-action@894ff025c7b54547a9a2a1e9f228beae737ad3c2 # v3
       with:
         token: ${{ secrets.CODECOV_TOKEN }}
         directory: ./coverage/reports/
