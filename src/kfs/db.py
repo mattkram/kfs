@@ -4,6 +4,7 @@ from typing import Iterator
 from typing import List
 from typing import Optional
 
+from rich.progress import track
 from sqlalchemy import Index
 from sqlalchemy.engine import Engine
 from sqlalchemy.exc import IntegrityError
@@ -112,13 +113,12 @@ def get_session() -> Session:
 
 def create_index() -> None:
     """Create the file index by writing File records to the database."""
-
-    def _file_paths() -> Iterator[Path]:
-        for path in base_dir().glob("**/*"):
-            if path.is_file() and path != db_path():
-                yield path
-
-    for path in _file_paths():
+    file_paths = [
+        path for path in base_dir().glob("**/*") if path.is_file() and path != db_path()
+    ]
+    num_new = 0
+    num_existing = 0
+    for path in track(file_paths, description="Indexing ..."):
         relative_path = path.relative_to(base_dir())
         with get_session() as session:
             session.add(File(name=path.name, path=str(relative_path.parent)))
@@ -126,5 +126,7 @@ def create_index() -> None:
                 session.commit()
             except IntegrityError:
                 # We can't have duplicate rows
-                # TODO: Add logger.debug statement
-                pass
+                num_existing += 1
+            else:
+                num_new += 1
+    console.print(f"Added {num_new} new files, found {num_existing} existing files.")
