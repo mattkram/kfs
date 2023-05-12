@@ -93,7 +93,10 @@ def create() -> None:
 _engine: Optional[Engine] = None
 
 
-def init() -> None:
+def init(raise_if_missing: bool = False) -> None:
+    if raise_if_missing and not db_path().exists():
+        raise FileNotFoundError("Database file does not exist")
+
     global _engine
     _engine = create_engine(db_url())
 
