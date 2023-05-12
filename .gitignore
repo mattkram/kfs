@@ -1,7 +1,14 @@
-.mypy_cache/
-.pytest_cache/
+# Environment and packaging
 __pycache__/
 .venv/
 env/
 *.egg-info
+
+# Test output
+test-reports/
+.coverage
+.mypy_cache/
+.pytest_cache/
+
+# App files
 kfs.sqlite3
