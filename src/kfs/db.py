@@ -2,7 +2,9 @@ import uuid
 from pathlib import Path
 from typing import Iterator
 from typing import List
+from typing import Literal
 from typing import Optional
+from typing import overload
 
 from rich.progress import track
 from sqlalchemy import Index
@@ -155,10 +157,33 @@ def get_files_with_tag(tag: str) -> list[File]:
         ).all()
 
 
+@overload
+def get_tag(tag: str, create: Literal[False] = False) -> Tag | None:
+    ...
+
+
+@overload
+def get_tag(tag: str, create: Literal[True]) -> Tag:
+    ...
+
+
+def get_tag(tag: str, create: bool = False) -> Tag | None:
+    category, _, value = tag.rpartition(":")
+    with get_session() as session:
+        obj = session.exec(
+            select(Tag).where(Tag.category == category, Tag.value == value)
+        ).one_or_none()
+        if obj is None and create:
+            obj = Tag(category=category, value=value)
+            session.add(obj)
+            session.commit()
+        return obj
+
+
 def add_tag_to_file(path: Path, tag: str) -> None:
     """Add a tag to a file."""
     category, _, value = tag.rpartition(":")
     with get_session() as session:
         file = session.exec(select(File).where(File.name == path.name)).one()
-        file.tags.append(Tag(category=category, value=value))
+        file.tags.append(get_tag(tag, create=True))
         session.commit()
