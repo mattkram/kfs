@@ -182,7 +182,6 @@ def get_tag(tag: str, create: bool = False) -> Tag | None:
 
 def add_tag_to_file(path: Path, tag: str) -> None:
     """Add a tag to a file."""
-    category, _, value = tag.rpartition(":")
     with get_session() as session:
         file = session.exec(select(File).where(File.name == path.name)).one()
         file.tags.append(get_tag(tag, create=True))
