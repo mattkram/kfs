@@ -20,3 +20,9 @@ def init() -> None:
         db.create()
     except FileExistsError:
         raise typer.Abort()
+
+
+@app.command()
+def index() -> None:
+    """Index the files in the filesystem."""
+    db.create_index()

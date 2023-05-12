@@ -1,5 +1,6 @@
 from pathlib import Path
 from typing import Callable
+from unittest.mock import patch
 
 import pytest
 from mypy_extensions import VarArg
@@ -54,3 +55,11 @@ def test_db_init_raises_if_file_exists(
     # We still see an error, even from subdirectories
     result = call_cli("init")
     assert result.exit_code == 1
+
+
+def test_index_files(call_cli: CLICaller) -> None:
+    """`kfs index` calls the db.create_index() function."""
+    with patch("kfs.db.create_index") as mock:
+        result = call_cli("index")
+    assert result.exit_code == 0
+    mock.assert_called_once()
