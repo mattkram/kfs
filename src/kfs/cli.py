@@ -6,6 +6,8 @@ from rich.console import Console
 from . import __version__
 from . import db
 
+DB_FILENAME = "kfs.sqlite3"
+
 console = Console()
 app = typer.Typer()
 db_app = typer.Typer()
@@ -20,7 +22,7 @@ def version() -> None:
 
 @db_app.command()
 def init(
-    path: Path = typer.Argument(lambda: Path.cwd() / "kfs.sqlite3"),
+    path: Path = typer.Argument(lambda: Path.cwd() / DB_FILENAME),
 ) -> None:
     """Initialize a new database."""
     path = path.resolve()
