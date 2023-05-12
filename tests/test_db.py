@@ -43,7 +43,11 @@ def test_database() -> None:
 @pytest.fixture()
 def file_paths(base_dir: Path) -> list[Path]:
     """Write a number of files and return the paths to those files."""
-    filenames = ["first_file_at_root.csv", "some/directory/some_file.txt"]
+    filenames = [
+        "first_file_at_root.csv",
+        "single_nesting/test_file.dat",
+        "some/directory/some_file.txt",
+    ]
 
     file_paths = [base_dir / filename for filename in filenames]
 
@@ -63,8 +67,8 @@ def test_create_index(base_dir: Path, file_paths: list[Path]) -> None:
 
     assert len(files) == len(file_paths)
 
-    for path in file_paths:
-        with db.get_session() as session:
+    with db.get_session() as session:
+        for path in file_paths:
             # Check that the file exists by name
             file = session.exec(
                 select(db.File).where(db.File.name == path.name)

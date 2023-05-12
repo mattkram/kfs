@@ -107,7 +107,15 @@ def get_session() -> Session:
 
 
 def create_index() -> None:
+    """Create the file index by writing File records to the database."""
+
+    def _file_paths() -> Iterator[Path]:
+        for path in base_dir().glob("**/*"):
+            if path.is_file() and path != db_path():
+                yield path
+
     with get_session() as session:
-        session.add(File(name="first_file_at_root.csv", path="."))
-        session.add(File(name="some_file.txt", path="some/directory"))
+        for path in _file_paths():
+            relative_path = path.relative_to(base_dir())
+            session.add(File(name=path.name, path=str(relative_path.parent)))
         session.commit()
