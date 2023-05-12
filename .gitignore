@@ -9,6 +9,7 @@ test-reports/
 .coverage
 .mypy_cache/
 .pytest_cache/
+.tox/
 
 # App files
 kfs.sqlite3

@@ -4,31 +4,17 @@ import pytest
 from sqlmodel import select
 
 from kfs import db
-
-
-@pytest.fixture()
-def base_dir(tmp_path: Path) -> Path:
-    return tmp_path
-
-
-@pytest.fixture()
-def sql_file_path(base_dir: Path) -> Path:
-    return base_dir / "kfs.db"
-
-
-@pytest.fixture()
-def sqlite_url(sql_file_path: Path) -> str:
-    return f"sqlite:///{sql_file_path}"
+from kfs.db import db_path
 
 
 @pytest.fixture(autouse=True)
-def database(sqlite_url: str) -> None:
-    db.init(sqlite_url)
+def database() -> None:
+    db.init()
 
 
-def test_init(sql_file_path: Path) -> None:
+def test_init() -> None:
     """After init, the database has been created and the file exists"""
-    assert sql_file_path.exists()
+    assert db_path().exists()
 
 
 def test_database() -> None:
@@ -52,3 +38,46 @@ def test_database() -> None:
         assert read_tag.category == "vendor"
         assert read_tag.value == "chevron"
         assert len(read_tag.files) == 1
+
+
+@pytest.fixture()
+def file_paths(base_dir: Path) -> list[Path]:
+    """Write a number of files and return the paths to those files."""
+    filenames = [
+        "first_file_at_root.csv",
+        "single_nesting/test_file.dat",
+        "some/directory/some_file.txt",
+    ]
+
+    file_paths = [base_dir / filename for filename in filenames]
+
+    for file_path in file_paths:
+        file_path.parent.mkdir(exist_ok=True, parents=True)
+        with file_path.open("w") as fp:
+            fp.write("Hello")
+
+    return file_paths
+
+
+@pytest.mark.parametrize("index_times", [1, 2])
+def test_create_index(base_dir: Path, file_paths: list[Path], index_times: int) -> None:
+    # Indexing should be idempotent
+    for _ in range(index_times):
+        db.create_index()
+
+    with db.get_session() as session:
+        files = session.exec(select(db.File)).all()
+
+    assert len(files) == len(file_paths)
+
+    with db.get_session() as session:
+        for path in file_paths:
+            # Check that the file exists by name
+            file = session.exec(
+                select(db.File).where(db.File.name == path.name)
+            ).one_or_none()
+            assert file is not None
+
+            # Check that the directory is correct
+            rel_directory = path.relative_to(base_dir).parent
+            assert Path(file.path) == rel_directory
