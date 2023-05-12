@@ -43,22 +43,34 @@ def test_database() -> None:
 @pytest.fixture()
 def file_paths(base_dir: Path) -> list[Path]:
     """Write a number of files and return the paths to those files."""
-    file_path = base_dir / "files"
-    file_path.mkdir()
+    filenames = ["first_file_at_root.csv", "some/directory/some_file.txt"]
 
-    filenames = ["some_file.txt"]
+    file_paths = [base_dir / filename for filename in filenames]
 
-    for path in filenames:
-        with (file_path / path).open("w") as fp:
+    for file_path in file_paths:
+        file_path.parent.mkdir(exist_ok=True, parents=True)
+        with file_path.open("w") as fp:
             fp.write("Hello")
 
-    return list(file_path.glob("**/*"))
+    return file_paths
 
 
-def test_create_index(file_paths: list[Path]) -> None:
+def test_create_index(base_dir: Path, file_paths: list[Path]) -> None:
     db.create_index()
+
     with db.get_session() as session:
-        # Retrieve the file from database
         files = session.exec(select(db.File)).all()
 
     assert len(files) == len(file_paths)
+
+    for path in file_paths:
+        with db.get_session() as session:
+            # Check that the file exists by name
+            file = session.exec(
+                select(db.File).where(db.File.name == path.name)
+            ).one_or_none()
+            assert file is not None
+
+            # Check that the directory is correct
+            rel_directory = path.relative_to(base_dir).parent
+            assert Path(file.path) == rel_directory

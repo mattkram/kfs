@@ -45,6 +45,10 @@ class Tag(SQLModel, table=True):
     )
 
 
+def base_dir() -> Path:
+    return db_path().parent
+
+
 def db_path() -> Path:
     """The path to the database file.
 
@@ -104,6 +108,6 @@ def get_session() -> Session:
 
 def create_index() -> None:
     with get_session() as session:
-        file = File(name="test_file.csv", path="/some/directory")
-        session.add(file)
+        session.add(File(name="first_file_at_root.csv", path="."))
+        session.add(File(name="some_file.txt", path="some/directory"))
         session.commit()
