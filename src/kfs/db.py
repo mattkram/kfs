@@ -12,8 +12,6 @@ from sqlmodel import create_engine
 
 from kfs import console
 
-_engine: Optional[Engine] = None
-
 DB_FILENAME = "kfs.sqlite3"
 
 
@@ -46,22 +44,35 @@ class Tag(SQLModel, table=True):
     )
 
 
+def db_path() -> Path:
+    """The path to the database file."""
+    return Path.cwd() / DB_FILENAME
+
+
+def db_url() -> str:
+    """The database connection string."""
+    return f"sqlite:///{db_path()}"
+
+
 def create() -> None:
     """Create the database file if it doesn't exist."""
-    path = Path.cwd() / DB_FILENAME
+    path = db_path()
 
     if path.exists():
         console.print(f"Database already exists at {path}")
         raise FileExistsError
 
-    console.print(f"Initializing the database at {path}")
+    console.print(f"Creating the database at {path}")
     path.parent.mkdir(exist_ok=True, parents=True)
-    init(url=f"sqlite:///{path}")
+    init()
 
 
-def init(url: str) -> None:
+_engine: Optional[Engine] = None
+
+
+def init() -> None:
     global _engine
-    _engine = create_engine(url)
+    _engine = create_engine(db_url())
 
     SQLModel.metadata.create_all(_engine)
 

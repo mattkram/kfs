@@ -1,34 +1,18 @@
-from pathlib import Path
-
 import pytest
 from sqlmodel import select
 
 from kfs import db
-
-
-@pytest.fixture()
-def base_dir(tmp_path: Path) -> Path:
-    return tmp_path
-
-
-@pytest.fixture()
-def sql_file_path(base_dir: Path) -> Path:
-    return base_dir / "kfs.db"
-
-
-@pytest.fixture()
-def sqlite_url(sql_file_path: Path) -> str:
-    return f"sqlite:///{sql_file_path}"
+from kfs.db import db_path
 
 
 @pytest.fixture(autouse=True)
-def database(sqlite_url: str) -> None:
-    db.init(sqlite_url)
+def database() -> None:
+    db.init()
 
 
-def test_init(sql_file_path: Path) -> None:
+def test_init() -> None:
     """After init, the database has been created and the file exists"""
-    assert sql_file_path.exists()
+    assert db_path().exists()
 
 
 def test_database() -> None:
