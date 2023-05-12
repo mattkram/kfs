@@ -1,4 +1,5 @@
 import uuid
+from pathlib import Path
 from typing import List
 from typing import Optional
 
@@ -8,6 +9,8 @@ from sqlmodel import Relationship
 from sqlmodel import Session
 from sqlmodel import SQLModel
 from sqlmodel import create_engine
+
+from kfs import console
 
 _engine: Optional[Engine] = None
 
@@ -39,6 +42,19 @@ class Tag(SQLModel, table=True):
     files: List[File] = Relationship(
         back_populates="tags", link_model=FileTagAssociation
     )
+
+
+def create(filename: str) -> None:
+    """Create the database file if it doesn't exist."""
+    path = Path.cwd() / filename
+
+    if path.exists():
+        console.print(f"Database already exists at {path}")
+        raise FileExistsError
+
+    console.print(f"Initializing the database at {path}")
+    path.parent.mkdir(exist_ok=True, parents=True)
+    init(url=f"sqlite:///{path}")
 
 
 def init(url: str) -> None:
