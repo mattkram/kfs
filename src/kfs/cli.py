@@ -25,4 +25,5 @@ def init() -> None:
 @app.command()
 def index() -> None:
     """Index the files in the filesystem."""
+    db.init()
     db.create_index()
