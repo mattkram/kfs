@@ -103,3 +103,13 @@ def test_add_tag_to_file(tag_index_map: dict[str, list[int]]) -> None:
         files = db.get_files_with_tag(tag)
         assert len(files) == len(indices)
         assert all(isinstance(f, db.File) for f in files)
+
+
+def test_add_tag_to_file_idempotent(file_paths: list[Path]) -> None:
+    db.create_index()
+    tag = "bank:chase"
+    for _ in range(2):
+        db.add_tag_to_file(file_paths[0], tag)
+
+    files = db.get_files_with_tag(tag)
+    assert len(files) == 1

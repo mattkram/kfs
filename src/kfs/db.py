@@ -184,5 +184,9 @@ def add_tag_to_file(path: Path, tag: str) -> None:
     """Add a tag to a file."""
     with get_session() as session:
         file = session.exec(select(File).where(File.name == path.name)).one()
-        file.tags.append(get_tag(tag, create=True))
+        obj = get_tag(tag, create=True)
+        if obj in file.tags:
+            # The file already has this tag
+            return
+        file.tags.append(obj)
         session.commit()
