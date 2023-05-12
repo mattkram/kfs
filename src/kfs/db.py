@@ -16,7 +16,7 @@ from sqlmodel import create_engine
 
 from kfs import console
 
-DB_FILENAME = "kfs.sqlite3"
+DB_FILENAME = "kfs.db"
 
 
 class FileTagAssociation(SQLModel, table=True):
