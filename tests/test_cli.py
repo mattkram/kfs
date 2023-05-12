@@ -72,3 +72,24 @@ def test_index_files(call_cli: CLICaller) -> None:
         result = call_cli("index")
     assert result.exit_code == 0
     mock.assert_called_once()
+
+
+def test_add_tag_to_file(call_cli: CLICaller, base_dir: Path) -> None:
+    call_cli("init")
+    filenames = ["file_1.txt", "file_2.txt"]
+    for f in filenames:
+        with (base_dir / f).open("w") as fp:
+            fp.write("Hi")
+
+    with patch("kfs.db.add_tag_to_file") as mock:
+        result = call_cli("tag", "--add", "bank:chase", *filenames)
+
+    assert result.exit_code == 0
+
+    assert mock.call_count == len(filenames)
+    mock.assert_has_calls(
+        [
+            ((base_dir / "file_1.txt", "bank:chase"),),  # type: ignore
+            ((base_dir / "file_2.txt", "bank:chase"),),  # type: ignore
+        ]
+    )

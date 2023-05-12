@@ -1,3 +1,5 @@
+from pathlib import Path
+
 import typer
 
 from . import __version__
@@ -22,13 +24,28 @@ def init() -> None:
         raise typer.Abort()
 
 
-@app.command()
-def index() -> None:
-    """Index the files in the filesystem."""
+def _ensure_db() -> None:
     try:
         db.init(raise_if_missing=True)
     except FileNotFoundError:
         console.print("Must initialize the database first with `kfs init`")
         raise typer.Abort()
 
+
+@app.command()
+def index() -> None:
+    """Index the files in the filesystem."""
+    _ensure_db()
     db.create_index()
+
+
+@app.command()
+def tag(
+    add: list[str] = typer.Option(None), paths: list[Path] = typer.Argument(...)
+) -> None:
+    """Add one or more tags to one or more files."""
+    _ensure_db()
+    paths = [Path.cwd() / p for p in paths if p.is_file()]
+    for tag in add:
+        for path in paths:
+            db.add_tag_to_file(path, tag)
