@@ -51,6 +51,7 @@ class Tag(SQLModel, table=True):
 
 
 def base_dir() -> Path:
+    """The base directory, from which all tracked files are referenced."""
     return db_path().parent
 
 
