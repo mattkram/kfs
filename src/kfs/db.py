@@ -13,6 +13,7 @@ from sqlmodel import Relationship
 from sqlmodel import Session
 from sqlmodel import SQLModel
 from sqlmodel import create_engine
+from sqlmodel import select
 
 from kfs import console
 
@@ -136,3 +137,28 @@ def create_index() -> None:
             else:
                 num_new += 1
     console.print(f"Added {num_new} new files, found {num_existing} existing files.")
+
+
+def get_files_with_tag(tag: str) -> list[File]:
+    """Return a list of files with the provided tag, where the tag is of the form `category:value`."""
+    category, _, value = tag.rpartition(":")
+    with get_session() as session:
+        return session.exec(
+            select(File)
+            .join(FileTagAssociation)
+            .join(Tag)
+            .where(
+                File.id == FileTagAssociation.file_id,
+                Tag.value == value,
+                Tag.category == category,
+            )
+        ).all()
+
+
+def add_tag_to_file(path: Path, tag: str) -> None:
+    """Add a tag to a file."""
+    category, _, value = tag.rpartition(":")
+    with get_session() as session:
+        file = session.exec(select(File).where(File.name == path.name)).one()
+        file.tags.append(Tag(category=category, value=value))
+        session.commit()

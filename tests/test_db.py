@@ -81,3 +81,21 @@ def test_create_index(base_dir: Path, file_paths: list[Path], index_times: int) 
             # Check that the directory is correct
             rel_directory = path.relative_to(base_dir).parent
             assert Path(file.path) == rel_directory
+
+
+def test_add_tag_to_file(file_paths: list[Path]):
+    db.create_index()
+    tag_index_map = {
+        "bank:chase": [0],
+        "bank:citi": [0, 1],
+        "no-category": [2],
+        "non-existent": [],
+    }
+    for tag, indices in tag_index_map.items():
+        for index in indices:
+            db.add_tag_to_file(file_paths[index], tag)
+
+    for tag, indices in tag_index_map.items():
+        files = db.get_files_with_tag(tag)
+        assert len(files) == len(indices)
+        assert all(isinstance(f, db.File) for f in files)
