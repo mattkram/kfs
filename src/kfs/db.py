@@ -118,13 +118,14 @@ def get_session() -> Session:
 
 def create_index() -> None:
     """Create the file index by writing File records to the database."""
+    base_path = base_dir()
     file_paths = [
-        path for path in base_dir().glob("**/*") if path.is_file() and path != db_path()
+        path for path in base_path.glob("**/*") if path.is_file() and path != db_path()
     ]
     num_new = 0
     num_existing = 0
     for path in track(file_paths, description="Indexing ..."):
-        relative_path = path.relative_to(base_dir())
+        relative_path = path.relative_to(base_path)
         with get_session() as session:
             session.add(File(name=path.name, path=str(relative_path.parent)))
             try:
