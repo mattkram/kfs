@@ -83,9 +83,10 @@ def test_create_index(base_dir: Path, file_paths: list[Path], index_times: int) 
             assert Path(file.path) == rel_directory
 
 
-def test_add_tag_to_file(file_paths: list[Path]):
+@pytest.fixture()
+def tag_index_map(file_paths: list[Path]) -> dict[str, list[int]]:
     db.create_index()
-    tag_index_map = {
+    tag_index_map: dict[str, list[int]] = {
         "bank:chase": [0],
         "bank:citi": [0, 1],
         "no-category": [2],
@@ -94,7 +95,10 @@ def test_add_tag_to_file(file_paths: list[Path]):
     for tag, indices in tag_index_map.items():
         for index in indices:
             db.add_tag_to_file(file_paths[index], tag)
+    return tag_index_map
 
+
+def test_add_tag_to_file(tag_index_map: dict[str, list[int]]) -> None:
     for tag, indices in tag_index_map.items():
         files = db.get_files_with_tag(tag)
         assert len(files) == len(indices)
