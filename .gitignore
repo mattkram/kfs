@@ -1,4 +1,7 @@
 .mypy_cache/
 .pytest_cache/
+__pycache__/
 .venv/
+env/
 *.egg-info
+kfs.sqlite3
