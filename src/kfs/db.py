@@ -60,15 +60,16 @@ def db_path() -> Path:
     Recursively searches parents until found. If not found, return path in current working directory.
 
     """
+    cwd = Path.cwd().resolve()
 
     def _dirs() -> Iterator[Path]:
-        yield Path.cwd()
-        yield from Path.cwd().resolve().parents
+        yield cwd
+        yield from cwd.parents
 
     for _dir in _dirs():
         if (p := _dir / DB_FILENAME).exists():
             return p
-    return Path.cwd() / DB_FILENAME
+    return cwd / DB_FILENAME
 
 
 def db_url() -> str:
