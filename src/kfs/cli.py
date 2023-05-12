@@ -26,5 +26,9 @@ def init(
     path = path.resolve()
     path.parent.mkdir(exist_ok=True, parents=True)
 
+    if path.exists():
+        console.print(f"Database already exists at {path}")
+        raise typer.Abort()
+
     console.print(f"Initializing the database at {path}")
     db.init(url=f"sqlite:///{path}")

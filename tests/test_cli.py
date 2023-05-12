@@ -39,8 +39,9 @@ def test_version(call_cli: CLICaller) -> None:
     assert f"kfs version: {__version__}" in result.stdout
 
 
-@pytest.fixture()
+@pytest.fixture(autouse=True)
 def base_dir(tmp_path: Path, monkeypatch: MonkeyPatch) -> Path:
+    """A temporary base directory, in which to run CLI commands."""
     monkeypatch.chdir(tmp_path)
     return tmp_path
 
@@ -57,3 +58,13 @@ def test_db_init(call_cli: CLICaller, base_dir: Path, path_arg: Optional[str]) -
 
     assert result.exit_code == 0
     assert db_path.exists()
+
+
+def test_db_init_raises_if_file_exists(call_cli: CLICaller) -> None:
+    """If we try to initialize the database after it exists, an error is raised."""
+    # Call once to create the database
+    call_cli("db", "init")
+    assert Path("kfs.sqlite3").exists()
+
+    result = call_cli("db", "init")
+    assert result.exit_code == 1
