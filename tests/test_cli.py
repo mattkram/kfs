@@ -1,6 +1,5 @@
 from pathlib import Path
 from typing import Callable
-from typing import Optional
 
 import pytest
 from mypy_extensions import VarArg
@@ -31,8 +30,7 @@ def test_version(call_cli: CLICaller) -> None:
     assert f"kfs version: {__version__}" in result.stdout
 
 
-@pytest.mark.parametrize("path_arg", [None, "db/db.sqlite3"])
-def test_db_init(call_cli: CLICaller, base_dir: Path, path_arg: Optional[str]) -> None:
+def test_db_init(call_cli: CLICaller, base_dir: Path) -> None:
     """The CLI initializes the database, which creates a file at the specified path."""
     result = call_cli("init")
 
@@ -40,11 +38,19 @@ def test_db_init(call_cli: CLICaller, base_dir: Path, path_arg: Optional[str]) -
     assert (base_dir / DB_FILENAME).exists()
 
 
-def test_db_init_raises_if_file_exists(call_cli: CLICaller) -> None:
+@pytest.mark.parametrize("from_subdir", [".", "directory", "directory/subdirectory"])
+def test_db_init_raises_if_file_exists(
+    call_cli: CLICaller, base_dir: Path, from_subdir: str
+) -> None:
     """If we try to initialize the database after it exists, an error is raised."""
     # Call once to create the database
     call_cli("init")
     assert Path("kfs.sqlite3").exists()
 
+    # Change to a subdirectory
+    subdir = base_dir / from_subdir
+    subdir.mkdir(parents=True, exist_ok=True)
+
+    # We still see an error, even from subdirectories
     result = call_cli("init")
     assert result.exit_code == 1

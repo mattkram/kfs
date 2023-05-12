@@ -1,5 +1,6 @@
 import uuid
 from pathlib import Path
+from typing import Iterator
 from typing import List
 from typing import Optional
 
@@ -45,7 +46,19 @@ class Tag(SQLModel, table=True):
 
 
 def db_path() -> Path:
-    """The path to the database file."""
+    """The path to the database file.
+
+    Recursively searches parents until found. If not found, return path in current working directory.
+
+    """
+
+    def _dirs() -> Iterator[Path]:
+        yield Path.cwd()
+        yield from Path.cwd().resolve().parents
+
+    for _dir in _dirs():
+        if (p := _dir / DB_FILENAME).exists():
+            return p
     return Path.cwd() / DB_FILENAME
 
 
