@@ -4,7 +4,6 @@ from typing import Callable
 from typing import Optional
 
 import pytest
-from _pytest.monkeypatch import MonkeyPatch
 from typer.testing import CliRunner
 from typer.testing import Result
 
@@ -37,13 +36,6 @@ def test_version(call_cli: CLICaller) -> None:
     result = call_cli("version")
     assert result.exit_code == 0
     assert f"kfs version: {__version__}" in result.stdout
-
-
-@pytest.fixture(autouse=True)
-def base_dir(tmp_path: Path, monkeypatch: MonkeyPatch) -> Path:
-    """A temporary base directory, in which to run CLI commands."""
-    monkeypatch.chdir(tmp_path)
-    return tmp_path
 
 
 @pytest.mark.parametrize("path_arg", [None, "db/db.sqlite3"])
