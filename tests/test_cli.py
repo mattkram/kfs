@@ -1,22 +1,14 @@
 from pathlib import Path
-from typing import TYPE_CHECKING
 from typing import Callable
 from typing import Optional
 
 import pytest
+from mypy_extensions import VarArg
 from typer.testing import CliRunner
 from typer.testing import Result
 
 from kfs import __version__
 from kfs.cli import app
-
-if TYPE_CHECKING:
-    from mypy_extensions import VarArg  # pragma: no cover
-else:
-
-    def VarArg(x):
-        return x
-
 
 CLICaller = Callable[[VarArg(str)], Result]
 
