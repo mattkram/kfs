@@ -9,7 +9,7 @@ from typer.testing import Result
 
 from kfs import __version__
 from kfs.cli import app
-from kfs.db import DB_FILENAME
+from kfs.db import db_path
 
 CLICaller = Callable[[VarArg(str)], Result]
 
@@ -36,7 +36,7 @@ def test_db_init(call_cli: CLICaller, base_dir: Path) -> None:
     result = call_cli("init")
 
     assert result.exit_code == 0
-    assert (base_dir / DB_FILENAME).exists()
+    assert db_path().exists()
 
 
 @pytest.mark.parametrize("from_subdir", [".", "directory", "directory/subdirectory"])
@@ -46,7 +46,7 @@ def test_db_init_raises_if_file_exists(
     """If we try to initialize the database after it exists, an error is raised."""
     # Call once to create the database
     call_cli("init")
-    assert Path(DB_FILENAME).exists()
+    assert db_path().exists()
 
     # Change to a subdirectory
     subdir = base_dir / from_subdir
