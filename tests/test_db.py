@@ -1,3 +1,5 @@
+from pathlib import Path
+
 import pytest
 from sqlmodel import select
 
@@ -36,3 +38,27 @@ def test_database() -> None:
         assert read_tag.category == "vendor"
         assert read_tag.value == "chevron"
         assert len(read_tag.files) == 1
+
+
+@pytest.fixture()
+def file_paths(base_dir: Path) -> list[Path]:
+    """Write a number of files and return the paths to those files."""
+    file_path = base_dir / "files"
+    file_path.mkdir()
+
+    filenames = ["some_file.txt"]
+
+    for path in filenames:
+        with (file_path / path).open("w") as fp:
+            fp.write("Hello")
+
+    return list(file_path.glob("**/*"))
+
+
+def test_create_index(file_paths: list[Path]) -> None:
+    db.create_index()
+    with db.get_session() as session:
+        # Retrieve the file from database
+        files = session.exec(select(db.File)).all()
+
+    assert len(files) == len(file_paths)

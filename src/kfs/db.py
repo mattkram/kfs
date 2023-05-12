@@ -100,3 +100,10 @@ def get_engine() -> Engine:
 def get_session() -> Session:
     """Create a new database session to use as a context manager."""
     return Session(get_engine())
+
+
+def create_index() -> None:
+    with get_session() as session:
+        file = File(name="test_file.csv", path="/some/directory")
+        session.add(file)
+        session.commit()
