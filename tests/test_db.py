@@ -59,8 +59,11 @@ def file_paths(base_dir: Path) -> list[Path]:
     return file_paths
 
 
-def test_create_index(base_dir: Path, file_paths: list[Path]) -> None:
-    db.create_index()
+@pytest.mark.parametrize("index_times", [1, 2])
+def test_create_index(base_dir: Path, file_paths: list[Path], index_times: int) -> None:
+    # Indexing should be idempotent
+    for _ in range(index_times):
+        db.create_index()
 
     with db.get_session() as session:
         files = session.exec(select(db.File)).all()

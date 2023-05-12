@@ -4,7 +4,9 @@ from typing import Iterator
 from typing import List
 from typing import Optional
 
+from sqlalchemy import Index
 from sqlalchemy.engine import Engine
+from sqlalchemy.exc import IntegrityError
 from sqlmodel import Field
 from sqlmodel import Relationship
 from sqlmodel import Session
@@ -33,6 +35,8 @@ class File(SQLModel, table=True):
     tags: List["Tag"] = Relationship(
         back_populates="files", link_model=FileTagAssociation
     )
+
+    __table_args__ = (Index("name_path_unique", "name", "path", unique=True),)
 
 
 class Tag(SQLModel, table=True):
@@ -114,8 +118,13 @@ def create_index() -> None:
             if path.is_file() and path != db_path():
                 yield path
 
-    with get_session() as session:
-        for path in _file_paths():
-            relative_path = path.relative_to(base_dir())
+    for path in _file_paths():
+        relative_path = path.relative_to(base_dir())
+        with get_session() as session:
             session.add(File(name=path.name, path=str(relative_path.parent)))
-        session.commit()
+            try:
+                session.commit()
+            except IntegrityError:
+                # We can't have duplicate rows
+                # TODO: Add logger.debug statement
+                pass
