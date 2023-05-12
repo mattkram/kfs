@@ -1,12 +1,8 @@
-from pathlib import Path
-
 import typer
 
 from . import __version__
 from . import console
 from . import db
-
-DB_FILENAME = "kfs.sqlite3"
 
 app = typer.Typer()
 db_app = typer.Typer()
@@ -20,11 +16,9 @@ def version() -> None:
 
 
 @db_app.command()
-def init(
-    path: Path = typer.Argument(lambda: Path.cwd() / DB_FILENAME),
-) -> None:
+def init() -> None:
     """Initialize a new database."""
     try:
-        db.create(filename=str(path))
+        db.create()
     except FileExistsError:
         raise typer.Abort()

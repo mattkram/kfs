@@ -14,6 +14,8 @@ from kfs import console
 
 _engine: Optional[Engine] = None
 
+DB_FILENAME = "kfs.sqlite3"
+
 
 class FileTagAssociation(SQLModel, table=True):
     file_id: Optional[uuid.UUID] = Field(
@@ -44,9 +46,9 @@ class Tag(SQLModel, table=True):
     )
 
 
-def create(filename: str) -> None:
+def create() -> None:
     """Create the database file if it doesn't exist."""
-    path = Path.cwd() / filename
+    path = Path.cwd() / DB_FILENAME
 
     if path.exists():
         console.print(f"Database already exists at {path}")

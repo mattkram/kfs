@@ -9,6 +9,7 @@ from typer.testing import Result
 
 from kfs import __version__
 from kfs.cli import app
+from kfs.db import DB_FILENAME
 
 CLICaller = Callable[[VarArg(str)], Result]
 
@@ -33,15 +34,10 @@ def test_version(call_cli: CLICaller) -> None:
 @pytest.mark.parametrize("path_arg", [None, "db/db.sqlite3"])
 def test_db_init(call_cli: CLICaller, base_dir: Path, path_arg: Optional[str]) -> None:
     """The CLI initializes the database, which creates a file at the specified path."""
-    if path_arg is None:
-        result = call_cli("db", "init")
-        db_path = base_dir / "kfs.sqlite3"
-    else:
-        result = call_cli("db", "init", path_arg)
-        db_path = base_dir / path_arg
+    result = call_cli("db", "init")
 
     assert result.exit_code == 0
-    assert db_path.exists()
+    assert (base_dir / DB_FILENAME).exists()
 
 
 def test_db_init_raises_if_file_exists(call_cli: CLICaller) -> None:
