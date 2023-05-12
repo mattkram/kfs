@@ -34,8 +34,10 @@ jobs:
     - name: Run tox
       run: tox
 
-    - name: Publish code coverage
-      run: |
-        codecov -t $CODECOV_TOKEN
-      env:
-        CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+    - name: Upload coverage to Codecov
+      uses: codecov/codecov-action@v3
+      with:
+        token: ${{ secrets.CODECOV_TOKEN }}
+        directory: ./coverage/reports/
+        env_vars: OS,PYTHON
+        files: ./test-reports/coverage.xml
