@@ -180,10 +180,30 @@ def get_tag(tag: str, create: bool = False) -> Tag | None:
         return obj
 
 
+def get_file_by_path(path: Path) -> File | None:
+    """Get a file by its path on disk, if it is in the database."""
+    relative_path = path.relative_to(base_dir())
+    with get_session() as session:
+        file = session.exec(
+            select(File).where(
+                File.name == path.name,
+                File.path == str(relative_path.parent),
+            )
+        ).one_or_none()
+        return file
+
+
 def add_tag_to_file(path: Path, tag: str) -> None:
     """Add a tag to a file."""
+    relative_path = path.relative_to(base_dir())
     with get_session() as session:
-        file = session.exec(select(File).where(File.name == path.name)).one()
+        file = session.exec(
+            select(File).where(
+                File.name == path.name,
+                File.path == str(relative_path.parent),
+            )
+        ).one()
+
         obj = get_tag(tag, create=True)
         if obj in file.tags:
             # The file already has this tag
