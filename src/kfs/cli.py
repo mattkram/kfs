@@ -25,5 +25,8 @@ def init() -> None:
 @app.command()
 def index() -> None:
     """Index the files in the filesystem."""
+    if not db.db_path().exists():
+        console.print("Must initialize the database first with `kfs init`")
+        raise typer.Abort()
     db.init()
     db.create_index()

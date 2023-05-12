@@ -57,8 +57,17 @@ def test_db_init_raises_if_file_exists(
     assert result.exit_code == 1
 
 
+def test_index_files_requires_database(call_cli: CLICaller) -> None:
+    """`kfs index` calls the db.create_index() function."""
+    result = call_cli("index")
+    assert result.exit_code == 1
+    call_cli("init")
+
+
 def test_index_files(call_cli: CLICaller) -> None:
     """`kfs index` calls the db.create_index() function."""
+    call_cli("init")
+
     with patch("kfs.db.create_index") as mock:
         result = call_cli("index")
     assert result.exit_code == 0
