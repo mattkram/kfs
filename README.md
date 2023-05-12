@@ -1,5 +1,9 @@
 # kfs
 
+[![Run Python Tests](https://github.com/mattkram/kfs/actions/workflows/ci.yml/badge.svg)](https://github.com/mattkram/kfs/actions/workflows/ci.yml)
+[![pre-commit.ci status](https://results.pre-commit.ci/badge/github/mattkram/kfs/main.svg)](https://results.pre-commit.ci/latest/github/mattkram/kfs/main)
+[![codecov](https://codecov.io/gh/mattkram/kfs/branch/main/graph/badge.svg?token=VBoRvPNPLZ)](https://codecov.io/gh/mattkram/kfs)
+
 ## Usage
 
 ### Initialize the database
