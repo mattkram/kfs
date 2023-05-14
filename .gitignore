@@ -12,4 +12,4 @@ test-reports/
 .tox/
 
 # App files
-kfs.sqlite3
+kfs.db

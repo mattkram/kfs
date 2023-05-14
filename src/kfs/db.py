@@ -2,7 +2,9 @@ import uuid
 from pathlib import Path
 from typing import Iterator
 from typing import List
+from typing import Literal
 from typing import Optional
+from typing import overload
 
 from rich.progress import track
 from sqlalchemy import Index
@@ -13,6 +15,7 @@ from sqlmodel import Relationship
 from sqlmodel import Session
 from sqlmodel import SQLModel
 from sqlmodel import create_engine
+from sqlmodel import select
 
 from kfs import console
 
@@ -136,3 +139,81 @@ def create_index() -> None:
             else:
                 num_new += 1
     console.print(f"Added {num_new} new files, found {num_existing} existing files.")
+
+
+def get_files_with_tag(tag: str) -> list[File]:
+    """Return a list of files with the provided tag, where the tag is of the form `category:value`."""
+    category, _, value = tag.rpartition(":")
+    with get_session() as session:
+        return session.exec(
+            select(File)
+            .join(FileTagAssociation)
+            .join(Tag)
+            .where(
+                File.id == FileTagAssociation.file_id,
+                Tag.value == value,
+                Tag.category == category,
+            )
+        ).all()
+
+
+@overload
+def get_tag(tag: str, create: Literal[False] = False) -> Tag | None:
+    ...
+
+
+@overload
+def get_tag(tag: str, create: Literal[True]) -> Tag:
+    ...
+
+
+def get_tag(tag: str, create: bool = False) -> Tag | None:
+    """Get a Tag object from the database, if it exists.
+
+    Args:
+        tag: The string version of the tag to create/get.
+        create: If True, a Tag will be created if it doesn't exist.
+
+    """
+    category, _, value = tag.rpartition(":")
+    with get_session() as session:
+        obj = session.exec(
+            select(Tag).where(Tag.category == category, Tag.value == value)
+        ).one_or_none()
+        if obj is None and create:
+            obj = Tag(category=category, value=value)
+            session.add(obj)
+            session.commit()
+        return obj
+
+
+def get_file_by_path(path: Path) -> File | None:
+    """Get a file by its path on disk, if it is in the database."""
+    relative_path = path.relative_to(base_dir())
+    with get_session() as session:
+        file = session.exec(
+            select(File).where(
+                File.name == path.name,
+                File.path == str(relative_path.parent),
+            )
+        ).one_or_none()
+        return file
+
+
+def add_tag_to_file(path: Path, tag: str) -> None:
+    """Add a tag to a file."""
+    relative_path = path.relative_to(base_dir())
+    with get_session() as session:
+        file = session.exec(
+            select(File).where(
+                File.name == path.name,
+                File.path == str(relative_path.parent),
+            )
+        ).one()
+
+        obj = get_tag(tag, create=True)
+        if obj in file.tags:
+            # The file already has this tag
+            return
+        file.tags.append(obj)
+        session.commit()

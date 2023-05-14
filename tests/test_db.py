@@ -46,7 +46,7 @@ def file_paths(base_dir: Path) -> list[Path]:
     filenames = [
         "first_file_at_root.csv",
         "single_nesting/test_file.dat",
-        "some/directory/some_file.txt",
+        "some/directory/test_file.dat",
     ]
 
     file_paths = [base_dir / filename for filename in filenames]
@@ -70,14 +70,43 @@ def test_create_index(base_dir: Path, file_paths: list[Path], index_times: int) 
 
     assert len(files) == len(file_paths)
 
-    with db.get_session() as session:
-        for path in file_paths:
-            # Check that the file exists by name
-            file = session.exec(
-                select(db.File).where(db.File.name == path.name)
-            ).one_or_none()
-            assert file is not None
+    for path in file_paths:
+        # Check that the file exists by name
+        file = db.get_file_by_path(path)
+        assert file is not None
 
-            # Check that the directory is correct
-            rel_directory = path.relative_to(base_dir).parent
-            assert Path(file.path) == rel_directory
+        # Check that the directory is correct
+        rel_directory = path.relative_to(base_dir).parent
+        assert Path(file.path) == rel_directory
+
+
+@pytest.fixture()
+def tag_index_map(file_paths: list[Path]) -> dict[str, list[int]]:
+    db.create_index()
+    tag_index_map: dict[str, list[int]] = {
+        "bank:chase": [0],
+        "bank:citi": [0, 1],
+        "no-category": [2],
+        "non-existent": [],
+    }
+    for tag, indices in tag_index_map.items():
+        for index in indices:
+            db.add_tag_to_file(file_paths[index], tag)
+    return tag_index_map
+
+
+def test_add_tag_to_file(tag_index_map: dict[str, list[int]]) -> None:
+    for tag, indices in tag_index_map.items():
+        files = db.get_files_with_tag(tag)
+        assert len(files) == len(indices)
+        assert all(isinstance(f, db.File) for f in files)
+
+
+def test_add_tag_to_file_idempotent(file_paths: list[Path]) -> None:
+    db.create_index()
+    tag = "bank:chase"
+    for _ in range(2):
+        db.add_tag_to_file(file_paths[0], tag)
+
+    files = db.get_files_with_tag(tag)
+    assert len(files) == 1
