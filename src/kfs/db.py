@@ -168,6 +168,13 @@ def get_tag(tag: str, create: Literal[True]) -> Tag:
 
 
 def get_tag(tag: str, create: bool = False) -> Tag | None:
+    """Get a Tag object from the database, if it exists.
+
+    Args:
+        tag: The string version of the tag to create/get.
+        create: If True, a Tag will be created if it doesn't exist.
+
+    """
     category, _, value = tag.rpartition(":")
     with get_session() as session:
         obj = session.exec(
