@@ -5,6 +5,7 @@ import typer
 from . import __version__
 from . import console
 from . import db
+from .table import print_files_table
 
 app = typer.Typer()
 
@@ -49,3 +50,11 @@ def tag(
     for tag in add:
         for path in paths:
             db.add_tag_to_file(path, tag)
+
+
+@app.command("list")
+def list_files(tag: str = typer.Option(...)) -> None:
+    """Print a table of files that are tagged with a specific tag."""
+    _ensure_db()
+    files = db.get_files_with_tag(tag)
+    print_files_table(files, f"Files with tag {tag}")
