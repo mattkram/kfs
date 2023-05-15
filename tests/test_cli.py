@@ -96,15 +96,20 @@ def test_add_tag_to_file(call_cli: CLICaller, base_dir: Path) -> None:
     mock.assert_has_calls(expected_calls)
 
 
-def test_list_files_with_tag(call_cli: CLICaller, base_dir: Path) -> None:
+@pytest.fixture()
+def indexed_dir(call_cli: CLICaller, base_dir: Path) -> list[str]:
     call_cli("init")
     filenames = ["file_1.txt", "file_2.txt"]
     for f in filenames:
         with (base_dir / f).open("w") as fp:
             fp.write("Hi")
     call_cli("index")
+    return filenames
 
-    call_cli("tag", "--add", "bank:chase", *filenames)
+
+def test_list_files_with_tag(call_cli: CLICaller, indexed_dir: list[str]) -> None:
+    """Tag files with a tag and ensure we print a table."""
+    call_cli("tag", "--add", "bank:chase", *indexed_dir)
 
     with patch("kfs.console.print") as mock:
         call_cli("list", "--tag", "bank:chase")
