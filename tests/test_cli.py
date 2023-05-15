@@ -4,6 +4,7 @@ from unittest.mock import _Call
 from unittest.mock import patch
 
 import pytest
+import rich.table
 from mypy_extensions import VarArg
 from typer.testing import CliRunner
 from typer.testing import Result
@@ -93,3 +94,24 @@ def test_add_tag_to_file(call_cli: CLICaller, base_dir: Path) -> None:
         args = (base_dir / filename, "bank:chase")
         expected_calls.append(_Call((args, {})))
     mock.assert_has_calls(expected_calls)
+
+
+@pytest.fixture()
+def indexed_dir(call_cli: CLICaller, base_dir: Path) -> list[str]:
+    call_cli("init")
+    filenames = ["file_1.txt", "file_2.txt"]
+    for f in filenames:
+        with (base_dir / f).open("w") as fp:
+            fp.write("Hi")
+    call_cli("index")
+    return filenames
+
+
+def test_list_files_with_tag(call_cli: CLICaller, indexed_dir: list[str]) -> None:
+    """Tag files with a tag and ensure we print a table."""
+    call_cli("tag", "--add", "bank:chase", *indexed_dir)
+
+    with patch("kfs.console.print") as mock:
+        call_cli("list", "--tag", "bank:chase")
+
+    assert isinstance(mock.call_args[0][0], rich.table.Table)
