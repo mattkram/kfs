@@ -22,7 +22,7 @@ ci = ["tox"]
 dev = [
   "mypy<=0.931",
   "pytest<=6.2.5",
-  "pytest-cov<=3.0.0",
+  "pytest-cov<=4.0.0",
   "toml<=0.10.2",
   "tox"
 ]
