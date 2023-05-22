@@ -20,7 +20,7 @@ requires-python = ">=3.10"
 [project.optional-dependencies]
 ci = ["tox"]
 dev = [
-  "mypy<=0.931",
+  "mypy<=0.991",
   "pytest<=6.2.5",
   "pytest-cov<=4.0.0",
   "toml<=0.10.2",
