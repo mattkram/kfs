@@ -8,7 +8,7 @@ authors = [
 ]
 dependencies = [
   "rich<=13.6.0",
-  "sqlmodel<=0.0.10",
+  "sqlmodel<=0.0.11",
   "typer<=0.9.0"
 ]
 description = "Kramer's File System"
