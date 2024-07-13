@@ -21,7 +21,7 @@ requires-python = ">=3.10"
 ci = ["tox"]
 dev = [
   "mypy<=1.10.0",
-  "pytest<=8.2.0",
+  "pytest<=8.2.2",
   "pytest-cov<=5.0.0",
   "toml<=0.10.2",
   "tox"
