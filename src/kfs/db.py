@@ -163,7 +163,8 @@ def get_tag(tag: str, create: Literal[False] = False) -> Tag | None:
 
 
 @overload
-def get_tag(tag: str, create: Literal[True]) -> Tag: pass
+def get_tag(tag: str, create: Literal[True]) -> Tag:
+    pass
 
 
 def get_tag(tag: str, create: bool = False) -> Tag | None:
