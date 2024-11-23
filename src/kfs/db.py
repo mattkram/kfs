@@ -159,12 +159,12 @@ def get_files_with_tag(tag: str) -> list[File]:
 
 @overload
 def get_tag(tag: str, create: Literal[False] = False) -> Tag | None:
-    ...
+    pass
 
 
 @overload
 def get_tag(tag: str, create: Literal[True]) -> Tag:
-    ...
+    pass
 
 
 def get_tag(tag: str, create: bool = False) -> Tag | None:
