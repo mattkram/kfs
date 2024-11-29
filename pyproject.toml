@@ -9,7 +9,7 @@ authors = [
 dependencies = [
   "rich<=13.9.4",
   "sqlmodel<=0.0.11",
-  "typer<=0.13.1"
+  "typer<=0.14.0"
 ]
 description = "Kramer's File System"
 dynamic = ["version"]
